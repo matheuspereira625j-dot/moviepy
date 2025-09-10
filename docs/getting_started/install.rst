@@ -1,82 +1,37 @@
-.. _install:
+from moviepy.editor import ImageClip, concatenate_videoclips, TextClip, CompositeVideoClip
 
-Installation
-============
+# Fotos que você enviou (coloque os nomes/endereços corretos dos arquivos)
+fotos = [
+    "foto1.jpg", "foto2.jpg", "foto3.jpg",
+    "foto4.jpg", "foto5.jpg", "foto6.jpg", "foto7.jpg"
+]
 
-Installation is done with ``pip``. If you don't have ``pip``, take a look at `how to install it <https://pip.pypa.io/en/stable/installation/>`_.
+# Frases que vão aparecer
+frases = [
+    "Meu maior presente é ter você na minha vida ❤️",
+    "A dona do sorriso mais lindo do mundo ✨",
+    "Seus cachos são poesia que até o vento admira 🌸",
+    "Hoje é o seu dia, mas quem comemora sou eu 🎉",
+    "Te amo mais do que consigo explicar 💍",
+    "Feliz Aniversário, meu amor – 10/10 ❤️"
+]
 
-With ``pip`` installed, just type this in a terminal:
+clips = []
+duracao_foto = 4  # cada foto fica 4s na tela
 
-.. code:: bash
+for i, foto in enumerate(fotos):
+    img = ImageClip(foto).set_duration(duracao_foto).resize(height=1920).resize(width=1080).set_position("center")
 
-    $ (sudo) pip install moviepy
+    if i < len(frases):
+        txt = TextClip(frases[i], fontsize=60, color="white", font="Arial-Bold", method="caption", size=(900, None))
+        txt = txt.set_duration(duracao_foto).set_position(("center", "bottom"))
+        clip = CompositeVideoClip([img, txt])
+    else:
+        clip = img
 
-.. _install-binaries:
+    clips.append(clip)
 
-Installation of Additional Binaries
------------------------------------
+final = concatenate_videoclips(clips, method="compose")
+final.write_videofile("video_namorada.mp4", fps=24)
 
-MoviePy depends on the software ffmpeg_ for video reading and writing and on ``ffplay`` for video previewing.
-
-You don't need to worry about ffmpeg_, as it should be automatically downloaded/installed by ImageIO during your first use of MoviePy (it takes a few seconds).
-
-You do need to worry about ``ffplay`` if you plan on using video/audio previewing. For these cases, make sure to have ``ffplay`` installed (it can usually be found alongside ``ffmpeg``) and ensure it is accessible to Python, or define a custom path (see below).
-
-Define Custom Paths to Binaries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you want to use a specific version of FFmpeg and FFplay, you can do so using environment variables.
-
-There are a couple of environment variables used by MoviePy that allow you to configure custom paths to the external tools.
-
-To set up any of these variables, the easiest way is to do it in Python before importing objects from MoviePy. For example:
-
-.. code-block:: python
-
-    import os
-    os.environ["FFMPEG_BINARY"] = "/path/to/custom/ffmpeg"
-    os.environ["FFPLAY_BINARY"] = "/path/to/custom/ffplay"
-
-Alternatively, after installing the optional dependencies, you can create
-a ``.env`` file in your working directory that will be automatically read.
-For example
-
-.. code-block:: ini
-
-    FFMPEG_BINARY=/path/to/custom/ffmpeg
-    FFPLAY_BINARY=/path/to/custom/ffplay
-
-Environment Variables
----------------------
-
-There are two available environment variables for external binaries:
-
-``FFMPEG_BINARY``
-    Normally you can leave it at its default ('ffmpeg-imageio'), in which
-    case imageio will download the correct ffmpeg binary (on first use) and then always use that binary.
-
-    The second option is ``"auto-detect"``. In this case, ffmpeg will be whatever
-    binary is found on the computer: generally ``ffmpeg`` (on Linux/macOS) or ``ffmpeg.exe`` (on Windows).
-
-    Lastly, you can set it to use a binary at a specific location on your disk by specifying the exact path.
-
-``FFPLAY_BINARY``
-    The default is ``"auto-detect"``. MoviePy will try to find and use the installed ``ffplay`` binary.
-
-    You can set it to use a binary at a specific location on your disk. On Windows, this might look like:
-
-    .. code-block:: python
-
-        os.environ["FFPLAY_BINARY"] = r"C:\Program Files\ffmpeg\ffplay.exe"
-
-Verify if MoviePy Finds Binaries
---------------------------------
-
-To test if FFmpeg and FFplay are found by MoviePy, in a Python console, you can run:
-
-.. code:: python
-
-    from moviepy.config import check
-    check()
-
-.. _ffmpeg: https://www.ffmpeg.org/download.html
+👉 Resultado: um vídeo vertical de ~30s, com as 7 fotos + frases. Depois é só postar no Instagram e colocar a música do Oruam.
